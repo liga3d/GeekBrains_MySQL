@@ -1,50 +1,50 @@
-#Сделать запрос, в котором мы выберем все данные о городе – регион, страна.
-SELECT `city`.`name` AS 'Город', `city`.`population` AS 'Население', `city`.`district` AS 'Район', `countries`.`name` AS 'Страна' FROM `city` 
+#РЎРґРµР»Р°С‚СЊ Р·Р°РїСЂРѕСЃ, РІ РєРѕС‚РѕСЂРѕРј РјС‹ РІС‹Р±РµСЂРµРј РІСЃРµ РґР°РЅРЅС‹Рµ Рѕ РіРѕСЂРѕРґРµ вЂ“ СЂРµРіРёРѕРЅ, СЃС‚СЂР°РЅР°.
+SELECT `city`.`name` AS 'Р“РѕСЂРѕРґ', `city`.`population` AS 'РќР°СЃРµР»РµРЅРёРµ', `city`.`district` AS 'Р Р°Р№РѕРЅ', `countries`.`name` AS 'РЎС‚СЂР°РЅР°' FROM `city` 
 LEFT JOIN `countries` ON `city`.`country_id` = `countries`.`id`
 WHERE `city`.`name` = 'Moscow';
 
-#Выбрать все города из Московской области.
-SELECT `city`.`name` AS 'Город', `city`.`population` AS 'Население', `city`.`district` AS 'Район', `countries`.`name` AS 'Страна' FROM `city` 
+#Р’С‹Р±СЂР°С‚СЊ РІСЃРµ РіРѕСЂРѕРґР° РёР· РњРѕСЃРєРѕРІСЃРєРѕР№ РѕР±Р»Р°СЃС‚Рё.
+SELECT `city`.`name` AS 'Р“РѕСЂРѕРґ', `city`.`population` AS 'РќР°СЃРµР»РµРЅРёРµ', `city`.`district` AS 'Р Р°Р№РѕРЅ', `countries`.`name` AS 'РЎС‚СЂР°РЅР°' FROM `city` 
 LEFT JOIN `countries` ON `city`.`country_id` = `countries`.`id`
 WHERE `city`.`district` LIKE 'Moskova%';
 
-#Выбрать среднюю зарплату по отделам.
-SELECT AVG(`workers`.`salary`) AS 'Кол-во работников', `department` FROM `workers` 
+#Р’С‹Р±СЂР°С‚СЊ СЃСЂРµРґРЅСЋСЋ Р·Р°СЂРїР»Р°С‚Сѓ РїРѕ РѕС‚РґРµР»Р°Рј.
+SELECT AVG(`workers`.`salary`) AS 'РљРѕР»-РІРѕ СЂР°Р±РѕС‚РЅРёРєРѕРІ', `department` FROM `workers` 
 LEFT JOIN `department` ON `workers`.`department_id` = `department`.`id` 
 GROUP BY `department_id` 
 HAVING `department_id` IS NOT NULL;
 
-#Выбрать максимальную зарплату у сотрудника.
+#Р’С‹Р±СЂР°С‚СЊ РјР°РєСЃРёРјР°Р»СЊРЅСѓСЋ Р·Р°СЂРїР»Р°С‚Сѓ Сѓ СЃРѕС‚СЂСѓРґРЅРёРєР°.
 
-SELECT `salary` AS 'зарплата', `name`, `lastname` FROM `workers` 
+SELECT `salary` AS 'Р·Р°СЂРїР»Р°С‚Р°', `name`, `lastname` FROM `workers` 
 ORDER BY `salary` DESC
 LIMIT 1;
 
-#Удалить одного сотрудника, у которого максимальная зарплата.
+#РЈРґР°Р»РёС‚СЊ РѕРґРЅРѕРіРѕ СЃРѕС‚СЂСѓРґРЅРёРєР°, Сѓ РєРѕС‚РѕСЂРѕРіРѕ РјР°РєСЃРёРјР°Р»СЊРЅР°СЏ Р·Р°СЂРїР»Р°С‚Р°.
 
 DELETE FROM `workers` ORDER BY `salary` DESC LIMIT 1;
 
-#Посчитать количество сотрудников во всех отделах.
+#РџРѕСЃС‡РёС‚Р°С‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРѕС‚СЂСѓРґРЅРёРєРѕРІ РІРѕ РІСЃРµС… РѕС‚РґРµР»Р°С….
 
-SELECT COUNT(*) AS 'Кол-во работников', `department` FROM `workers` 
+SELECT COUNT(*) AS 'РљРѕР»-РІРѕ СЂР°Р±РѕС‚РЅРёРєРѕРІ', `department` FROM `workers` 
 LEFT JOIN `department` ON `workers`.`department_id` = `department`.`id` 
 GROUP BY `department_id` 
 HAVING `department_id` IS NOT NULL;
-#это с разбивкой по отделам
-SELECT COUNT(*) AS 'Кол-во работников' FROM `workers` 
+#СЌС‚Рѕ СЃ СЂР°Р·Р±РёРІРєРѕР№ РїРѕ РѕС‚РґРµР»Р°Рј
+SELECT COUNT(*) AS 'РљРѕР»-РІРѕ СЂР°Р±РѕС‚РЅРёРєРѕРІ' FROM `workers` 
 LEFT JOIN `department` ON `workers`.`department_id` = `department`.`id` 
 WHERE `department` IS NOT NULL;
-#это всего сотрудников во всех отделах
+#СЌС‚Рѕ РІСЃРµРіРѕ СЃРѕС‚СЂСѓРґРЅРёРєРѕРІ РІРѕ РІСЃРµС… РѕС‚РґРµР»Р°С…
 
-#Найти количество сотрудников в отделах и посмотреть, сколько всего денег получает отдел.
-SELECT COUNT(*) AS 'Кол-во работников', SUM(`salary`) AS 'Зарплатный фонд', `department` AS 'Отдел' FROM `workers` 
+#РќР°Р№С‚Рё РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРѕС‚СЂСѓРґРЅРёРєРѕРІ РІ РѕС‚РґРµР»Р°С… Рё РїРѕСЃРјРѕС‚СЂРµС‚СЊ, СЃРєРѕР»СЊРєРѕ РІСЃРµРіРѕ РґРµРЅРµРі РїРѕР»СѓС‡Р°РµС‚ РѕС‚РґРµР».
+SELECT COUNT(*) AS 'РљРѕР»-РІРѕ СЂР°Р±РѕС‚РЅРёРєРѕРІ', SUM(`salary`) AS 'Р—Р°СЂРїР»Р°С‚РЅС‹Р№ С„РѕРЅРґ', `department` AS 'РћС‚РґРµР»' FROM `workers` 
 LEFT JOIN `department` ON `workers`.`department_id` = `department`.`id` 
 GROUP BY `department_id`
 HAVING `department_id` IS NOT NULL;
-#количество сотрудников и зарплатный фонд для сотрудников без отдела
-SELECT COUNT(*) AS 'Кол-во работников', SUM(`salary`) AS 'Зарплатный фонд', `department` AS 'Отдел' FROM `workers` 
+#РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРѕС‚СЂСѓРґРЅРёРєРѕРІ Рё Р·Р°СЂРїР»Р°С‚РЅС‹Р№ С„РѕРЅРґ РґР»СЏ СЃРѕС‚СЂСѓРґРЅРёРєРѕРІ Р±РµР· РѕС‚РґРµР»Р°
+SELECT COUNT(*) AS 'РљРѕР»-РІРѕ СЂР°Р±РѕС‚РЅРёРєРѕРІ', SUM(`salary`) AS 'Р—Р°СЂРїР»Р°С‚РЅС‹Р№ С„РѕРЅРґ', `department` AS 'РћС‚РґРµР»' FROM `workers` 
 LEFT JOIN `department` ON `workers`.`department_id` = `department`.`id` 
 GROUP BY `department_id`
 HAVING `department_id` IS NULL; 
-#Общее количество работников и зп
-SELECT COUNT(*) AS 'Кол-во работников', SUM(`salary`) AS 'Зарплатный фонд' FROM `workers`;
+#РћР±С‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЂР°Р±РѕС‚РЅРёРєРѕРІ Рё Р·Рї
+SELECT COUNT(*) AS 'РљРѕР»-РІРѕ СЂР°Р±РѕС‚РЅРёРєРѕРІ', SUM(`salary`) AS 'Р—Р°СЂРїР»Р°С‚РЅС‹Р№ С„РѕРЅРґ' FROM `workers`;
