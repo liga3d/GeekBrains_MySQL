@@ -1,0 +1,50 @@
+#Сделать запрос, в котором мы выберем все данные о городе – регион, страна.
+SELECT `city`.`name` AS 'Город', `city`.`population` AS 'Население', `city`.`district` AS 'Район', `countries`.`name` AS 'Страна' FROM `city` 
+LEFT JOIN `countries` ON `city`.`country_id` = `countries`.`id`
+WHERE `city`.`name` = 'Moscow';
+
+#Выбрать все города из Московской области.
+SELECT `city`.`name` AS 'Город', `city`.`population` AS 'Население', `city`.`district` AS 'Район', `countries`.`name` AS 'Страна' FROM `city` 
+LEFT JOIN `countries` ON `city`.`country_id` = `countries`.`id`
+WHERE `city`.`district` LIKE 'Moskova%';
+
+#Выбрать среднюю зарплату по отделам.
+SELECT AVG(`workers`.`salary`) AS 'Кол-во работников', `department` FROM `workers` 
+LEFT JOIN `department` ON `workers`.`department_id` = `department`.`id` 
+GROUP BY `department_id` 
+HAVING `department_id` IS NOT NULL;
+
+#Выбрать максимальную зарплату у сотрудника.
+
+SELECT `salary` AS 'зарплата', `name`, `lastname` FROM `workers` 
+ORDER BY `salary` DESC
+LIMIT 1;
+
+#Удалить одного сотрудника, у которого максимальная зарплата.
+
+DELETE FROM `workers` ORDER BY `salary` DESC LIMIT 1;
+
+#Посчитать количество сотрудников во всех отделах.
+
+SELECT COUNT(*) AS 'Кол-во работников', `department` FROM `workers` 
+LEFT JOIN `department` ON `workers`.`department_id` = `department`.`id` 
+GROUP BY `department_id` 
+HAVING `department_id` IS NOT NULL;
+#это с разбивкой по отделам
+SELECT COUNT(*) AS 'Кол-во работников' FROM `workers` 
+LEFT JOIN `department` ON `workers`.`department_id` = `department`.`id` 
+WHERE `department` IS NOT NULL;
+#это всего сотрудников во всех отделах
+
+#Найти количество сотрудников в отделах и посмотреть, сколько всего денег получает отдел.
+SELECT COUNT(*) AS 'Кол-во работников', SUM(`salary`) AS 'Зарплатный фонд', `department` AS 'Отдел' FROM `workers` 
+LEFT JOIN `department` ON `workers`.`department_id` = `department`.`id` 
+GROUP BY `department_id`
+HAVING `department_id` IS NOT NULL;
+#количество сотрудников и зарплатный фонд для сотрудников без отдела
+SELECT COUNT(*) AS 'Кол-во работников', SUM(`salary`) AS 'Зарплатный фонд', `department` AS 'Отдел' FROM `workers` 
+LEFT JOIN `department` ON `workers`.`department_id` = `department`.`id` 
+GROUP BY `department_id`
+HAVING `department_id` IS NULL; 
+#Общее количество работников и зп
+SELECT COUNT(*) AS 'Кол-во работников', SUM(`salary`) AS 'Зарплатный фонд' FROM `workers`;
