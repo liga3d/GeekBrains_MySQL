@@ -1,0 +1,46 @@
+#Создать VIEW на основе запросов, которые вы сделали в ДЗ к уроку 3
+
+CREATE VIEW `info` AS
+SELECT CONCAT(`workers`.`lastname`, ' ', `workers`.`name`) AS 'Фамилия Имя', `profession`.`profession` AS 'Профессия', 
+`department`.`department` AS 'Отдел' FROM `workers`
+LEFT JOIN `profession` ON `workers`.`profession_id` = `profession`.`id`
+LEFT JOIN `department` ON `workers`.`department_id` = `department`.`id`
+WHERE `workers`.`department_id` IS NOT NULL
+ORDER BY `workers`.`lastname` ASC;
+
+SELECT * FROM `info` LIMIT 2900, 3000;
+
+#Создать функцию, которая найдет менеджера по имени и фамилии.
+
+CREATE FUNCTION `find_worker` (n VARCHAR(25), l VARCHAR(35))
+RETURNS INT DETERMINISTIC
+READS SQL DATA
+RETURN (SELECT `id` FROM `workers` WHERE `name` = n AND `lastname` = l);
+
+SELECT `find_worker`('Никодим', 'Якушев');
+
+SELECT * FROM `workers` WHERE `id` = 1204;
+
+#Создать триггер, который при добавлении нового сотрудника будет выплачивать ему вступительный бонус, занося #запись об этом в таблицу salary.
+
+#Для начала создадим таблицу
+CREATE TABLE `salary` (
+`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+`payment` INT NOT NULL,
+`date` DATE,
+`worker_id` INT
+);
+
+#Теперь триггер
+CREATE TRIGGER `newbie_bonus_trigger`
+AFTER INSERT ON `workers`
+FOR EACH ROW
+INSERT INTO `salary` (`payment`, `date`, `worker_id`) VALUES (NEW.salary, curdate(), NEW.id);
+
+#Добавляю еще 10к сотрудников
+#И смотрим сколько мы должны денег всего
+
+SELECT SUM(`payment`) AS 'Выплаты', `date` FROM `salary` GROUP BY `date`;
+
+#Посмотрите базу, я специально написал генератор имен, фамилий, специальностей и зарплат :)
+
