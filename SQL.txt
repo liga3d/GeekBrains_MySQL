@@ -1,0 +1,62 @@
+#Создадим таблицу счетов сотрудников, куда будем производить выплаты
+
+CREATE TABLE `balance` (
+`worker_id` INT NOT NULL PRIMARY KEY,
+`balance` INT NOT NULL DEFAULT 0
+);
+
+#Создадим счета для всех сотрудников с 0 балансом
+INSERT INTO `balance` (`worker_id`) SELECT `id` FROM `workers`;
+
+#Модифицируем таблицу выплат, создадим поля совершения платежа и даты совершения платежа
+
+ALTER TABLE `Lesson_03`.`salary` 
+ADD COLUMN `completed` TINYINT NOT NULL DEFAULT 0 AFTER `worker_id`,
+ADD COLUMN `transaction_date` DATE NULL AFTER `completed`;
+
+#Используем транзакцию для зацисления на баланс выплат из таблицы salary
+
+SET AUTOCOMMIT = 0;
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+
+START TRANSACTION;
+UPDATE `balance` 
+JOIN `salary` ON `balance`.`worker_id` = `salary`.`worker_id`
+SET `balance`.`balance` = `balance`.`balance` + `salary`.`payment`
+WHERE `salary`.`completed` = 0;
+UPDATE `salary` SET `completed` = 1, `transaction_date` = CURDATE()
+WHERE `salary`.`completed` = 0;
+COMMIT;
+
+#начислим зарплату всем в таблицу salary
+START TRANSACTION;
+INSERT INTO `salary` (`payment`, `date`, `worker_id`) 
+SELECT `salary`, curdate(), `id` FROM `workers`;
+COMMIT;
+
+#Проверяем таблицу salary
+SELECT * FROM Lesson_03.salary WHERE `completed` = 0;
+
+#Зачисляем на баланс уже написанной транзакцией 
+START TRANSACTION;
+UPDATE `balance` 
+JOIN `salary` ON `balance`.`worker_id` = `salary`.`worker_id`
+SET `balance`.`balance` = `balance`.`balance` + `salary`.`payment`
+WHERE `salary`.`completed` = 0;
+UPDATE `salary` SET `completed` = 1, `transaction_date` = CURDATE()
+WHERE `salary`.`completed` = 0;
+COMMIT;
+
+#Проверяем таблицу balance
+SELECT * FROM Lesson_03.balance;
+
+#Анализируем запросы
+EXPLAIN SELECT `name` FROM `workers` WHERE `name` = 'Захар' AND `lastname` = 'Иванов';
+
+EXPLAIN SELECT * FROM `salary` WHERE `id` IN (SELECT `id` FROM `workers` WHERE `name` = 'Иван' AND `lastname` = 'Сорокин');
+
+EXPLAIN SELECT * FROM `salary` WHERE `id` IN (SELECT `id` FROM `workers` WHERE `name` = 'Иван');
+
+EXPLAIN SELECT * FROM `salary` WHERE `id` IN (SELECT `id` FROM `workers` WHERE `name` = 'Захар') ORDER BY `worker_id`;
+
+EXPLAIN SELECT * FROM `balance` WHERE `worker_id` IN (SELECT `id` FROM `workers` WHERE `name` = 'Захар') ORDER BY `worker_id`;
